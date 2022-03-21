@@ -250,6 +250,12 @@ router.post('/create-setup-intent', async (req, res) => {
   const {email, payment_method_types = []} = req.body;
   const {secret_key} = getKeys(payment_method_types[0]);
 
+  console.log('REQUEST /create-setup-intent', {
+   email,
+   payment_method_types,
+   secret_key
+  })
+
   const stripe = new Stripe(secret_key, {
     apiVersion: '2020-08-27',
   });
@@ -273,6 +279,12 @@ router.post('/create-setup-intent', async (req, res) => {
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
     clientSecret: setupIntent.client_secret,
   });
+
+  console.log('RESPONSE /create-setup-intent', {
+    customerId: gottenCustomer.id,
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    clientSecret: setupIntent.client_secret
+  })
 });
 
 // Expose a endpoint as a webhook handler for asynchronous events.
@@ -424,6 +436,12 @@ router.post('/charge-card-off-session', async (req, res) => {
 router.post('/payment-sheet', async (req, res) => {
   const {customerId, currency, amount} = req.body;
 
+  console.log("REQUEST /payment-sheet", {
+    customerId,
+    currency,
+    amount
+  })
+
   const {secret_key} = getKeys();
 
   const stripe = new Stripe(secret_key, {
@@ -444,6 +462,12 @@ router.post('/payment-sheet', async (req, res) => {
     ephemeralKey: ephemeralKey.secret,
     customer: customerId,
   });
+
+  console.log("RESPONSE /payment-sheet", {
+    paymentIntent: paymentIntent.client_secret,
+    ephemeralKey: ephemeralKey.secret,
+    customer: customerId
+  })
 });
 
 module.exports = router;
